@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Data Pribadi</h2>
+<div id="error-message" class="alert alert-danger" style="display: none;"></div>
+<form id="personalDataForm" class="needs-validation" novalidate>
+    <div class="mb-3">
+        <label for="name" class="form-label">Nama Lengkap</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+        <div class="invalid-feedback">
+            Mohon masukkan nama lengkap Anda.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="age" class="form-label">Umur</label>
+        <input type="number" class="form-control" id="age" name="age" min="1" max="120" required>
+        <div class="invalid-feedback">
+            Mohon masukkan umur Anda.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="education" class="form-label">Pendidikan Terakhir</label>
+        <select class="form-select" id="education" name="education" required>
+            <option value="">Pilih pendidikan...</option>
+            <option value="SD">Sekolah Dasar (SD)</option>
+            <option value="SMP">Sekolah Menengah Pertama (SMP)</option>
+            <option value="SMA/SMK">SMA/SMK</option>
+            <option value="D3">D3</option>
+            <option value="S1/D4">S1/D4</option>
+            <option value="S2">S2</option>
+            <option value="S3">S3</option>
+        </select>
+        <div class="invalid-feedback">
+            Mohon pilih pendidikan terakhir Anda.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="domicile" class="form-label">Domisili</label>
+        <input type="text" class="form-control" id="domicile" name="domicile" required>
+        <div class="invalid-feedback">
+            Mohon masukkan domisili Anda.
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Jenis Kelamin</label>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="male" value="male" required>
+            <label class="form-check-label" for="male">Laki-laki</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="gender" id="female" value="female">
+            <label class="form-check-label" for="female">Perempuan</label>
+        </div>
+        <div class="invalid-feedback">
+            Mohon pilih jenis kelamin Anda.
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lanjut ke Kuesioner</button>
+</form>
+
+<script>
+document.getElementById('personalDataForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+    }
+
+    const formData = new FormData(this);
+    const errorMessage = document.getElementById('error-message');
+    
+    fetch('/submit_personal_data', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = '/questionnaire';
+        } else {
+            errorMessage.textContent = data.message || 'Error submitting personal data. Please try again.';
+            errorMessage.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        errorMessage.textContent = 'Error submitting personal data. Please try again.';
+        errorMessage.style.display = 'block';
+    });
+});
+</script>
+{% endblock %} 

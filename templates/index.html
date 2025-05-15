@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+    <h1 class="mb-4">Selamat Datang di Penilaian Kesadaran Keamanan Siber</h1>
+    <p class="lead mb-4">Silakan isi kuesioner untuk menilai tingkat kesadaran keamanan siber Anda.</p>
+    <a href="{{ url_for('personal_data') }}" class="btn btn-primary btn-lg">Mulai Kuesioner</a>
+</div>
+{% endblock %} 

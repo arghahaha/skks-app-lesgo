@@ -1,0 +1,16 @@
+2025-04-10 14:08:29,512 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://192.168.95.204:5000
+2025-04-10 14:08:29,515 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-04-10 14:08:29,532 - werkzeug - INFO -  * Restarting with stat
+2025-04-10 14:08:36,890 - werkzeug - WARNING -  * Debugger is active!
+2025-04-10 14:08:36,910 - werkzeug - INFO -  * Debugger PIN: 112-254-600
+2025-04-10 14:08:37,310 - werkzeug - INFO - 127.0.0.1 - - [10/Apr/2025 14:08:37] "GET / HTTP/1.1" 200 -
+2025-04-10 14:08:38,663 - werkzeug - INFO - 127.0.0.1 - - [10/Apr/2025 14:08:38] "GET / HTTP/1.1" 200 -
+2025-04-10 14:08:40,739 - werkzeug - INFO - 127.0.0.1 - - [10/Apr/2025 14:08:40] "GET /personal_data HTTP/1.1" 200 -
+2025-04-10 14:08:49,718 - werkzeug - INFO - 127.0.0.1 - - [10/Apr/2025 14:08:49] "POST /submit_personal_data HTTP/1.1" 200 -
+2025-04-10 14:08:49,878 - werkzeug - INFO - 127.0.0.1 - - [10/Apr/2025 14:08:49] "GET /questionnaire HTTP/1.1" 200 -
+2025-04-10 14:10:14,249 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-10 14:10:36,434 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-10 14:10:36,439 - werkzeug - INFO - 127.0.0.1 - - [10/Apr/2025 14:10:36] "POST /submit_questionnaire HTTP/1.1" 200 -

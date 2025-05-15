@@ -1,0 +1,6 @@
+to-improve skks:
+1. make sure the "name" doesn't count as input data
+2. attach the personalized recommendations into certificate
+3. learn html to remake the certificate format
+
+don't be satisfied, keep digging!

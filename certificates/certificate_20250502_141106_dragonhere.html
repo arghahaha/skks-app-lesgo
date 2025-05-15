@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background-color: #f8f9fa;
+        }
+        .certificate {
+            background-color: white;
+            border: 2px solid #0d6efd;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            margin-bottom: 40px;
+            page-break-after: always;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .title {
+            font-size: 24px;
+            color: #0d6efd;
+            margin-bottom: 20px;
+        }
+        .content {
+            margin: 30px 0;
+        }
+        .name {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #0d6efd;
+        }
+        .score {
+            font-size: 20px;
+            margin: 20px 0;
+            color: #198754;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .seal {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 100px;
+            height: 100px;
+            border: 2px solid #0d6efd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #0d6efd;
+        }
+        .assessment {
+            background-color: white;
+            border: 2px solid #0d6efd;
+            padding: 40px;
+            text-align: left;
+            position: relative;
+            page-break-after: always;
+        }
+        .assessment .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .assessment-section {
+            margin-bottom: 30px;
+        }
+        .assessment-section h3 {
+            color: #0d6efd;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .indicator-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e9ecef;
+        }
+        .indicator-name {
+            flex: 3;
+        }
+        .indicator-score {
+            flex: 1;
+            text-align: right;
+            font-weight: bold;
+        }
+        .overall-scores {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .score-box {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            min-width: 120px;
+        }
+        .score-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        .score-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #198754;
+        }
+        .awareness-level {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .recommendations {
+            background-color: white;
+            border: 2px solid #0d6efd;
+            padding: 40px;
+            text-align: left;
+            position: relative;
+        }
+        .recommendations .title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .recommendations p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        .recommendations ul {
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        .recommendations li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- First Page: Certificate -->
+    <div class="certificate">
+        <div class="header">
+            <div class="title">SERTIFIKAT PENILAIAN KESADARAN KEAMANAN SIBER</div>
+        </div>
+        
+        <div class="content">
+            <p>Dengan ini menyatakan bahwa</p>
+            <div class="name">dragonhere</div>
+            <p>telah menyelesaikan penilaian kesadaran keamanan siber dengan skor</p>
+            <div class="score">61.7%</div>
+            <p>dengan tingkat kesadaran keamanan siber</p>
+            <div class="score">Sedang</div>
+            <p>pada tanggal 02 May 2025</p>
+        </div>
+        
+        <div class="footer">
+            <p>Diterbitkan oleh Tim Penilai Kesadaran Keamanan Siber</p>
+        </div>
+        
+        <div class="seal">
+            SERTIFIKAT
+        </div>
+    </div>
+    
+    <!-- Second Page: Detailed Assessment -->
+    <div class="assessment">
+        <div class="title">HASIL PENILAIAN KESADARAN KEAMANAN SIBER</div>
+        
+        <div class="overall-scores">
+            <div class="score-box">
+                <div class="score-label">Kesadaran Teknis</div>
+                <div class="score-value">58.8%</div>
+            </div>
+            <div class="score-box">
+                <div class="score-label">Kesadaran Sosial</div>
+                <div class="score-value">64.5%</div>
+            </div>
+            <div class="score-box">
+                <div class="score-label">Skor Keseluruhan</div>
+                <div class="score-value">61.7%</div>
+            </div>
+        </div>
+        
+        <div class="awareness-level" style="text-align: center; margin-bottom: 30px;">
+            Tingkat Kesadaran Keamanan Siber: <span style="color: #198754;">Sedang</span>
+        </div>
+        
+        <div class="assessment-section">
+            <h3>Kesadaran Keamanan Siber Teknis</h3>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Terms and Conditions of Device / Application Installation</div>
+                <div class="indicator-score">41.7%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Setting Controls and Updates</div>
+                <div class="indicator-score">60.0%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Backup and Data Recovery</div>
+                <div class="indicator-score">62.5%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Encryption and Protection</div>
+                <div class="indicator-score">65.0%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Account and Authentication Security</div>
+                <div class="indicator-score">65.0%</div>
+            </div>
+            
+        </div>
+        
+        <div class="assessment-section">
+            <h3>Kesadaran Keamanan Siber Sosial</h3>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Social Engineering Recognition</div>
+                <div class="indicator-score">70.0%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Information Sharing Practices</div>
+                <div class="indicator-score">65.0%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Online Privacy Management</div>
+                <div class="indicator-score">62.5%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Online Transaction Security</div>
+                <div class="indicator-score">58.3%</div>
+            </div>
+            
+            <div class="indicator-row">
+                <div class="indicator-name">Cyber Incident Handling</div>
+                <div class="indicator-score">66.7%</div>
+            </div>
+            
+        </div>
+        
+        <div class="footer" style="text-align: center; margin-top: 40px;">
+            <p>Hasil penilaian ini berdasarkan jawaban yang diberikan pada kuesioner kesadaran keamanan siber.</p>
+        </div>
+    </div>
+    
+    <!-- Third Page: Recommendations -->
+    <div class="recommendations">
+        <div class="title">REKOMENDASI KEAMANAN SIBER YANG DIPERSONALISASI</div>
+        
+        <p>Berdasarkan penilaian kesadaran keamanan siber yang telah dilakukan, berikut adalah rekomendasi yang disesuaikan dengan profil dan jawaban Anda:</p>
+        
+        <div class="recommendation-content">
+            Berdasarkan profil dan respons kuesioner yang diberikan, berikut adalah rekomendasi keamanan siber yang dipersonalisasi untuk Anda, dragonhere:
+
+1. Profil demografis:
+    - Anda berada di usia yang cukup matang di mana Anda mungkin telah memiliki banyak pengalaman dengan teknologi. Namun, penting untuk terus memperbarui pengetahuan Anda mengenai keamanan siber. Sebagai seorang laki-laki, Anda mungkin menemukan diri Anda menjadi target utama untuk serangan siber. Oleh karena itu, penting untuk selalu waspada.
+
+2. Respons kuesioner:
+    - Respons Anda menunjukkan bahwa Anda mungkin memiliki beberapa kelemahan dalam pemahaman Anda tentang keamanan siber. Misalnya, Anda mungkin tidak selalu memperbarui perangkat lunak atau sistem operasi, atau mungkin Anda tidak memiliki kebiasaan yang baik dalam membuat dan memperbarui kata sandi. Untuk meningkatkan kesadaran dan praktik keamanan siber, pertimbangkan untuk mengambil kursus online atau seminar tentang topik ini.
+
+3. Tingkat pendidikan dan latar belakang teknis:
+    - Anda memiliki tingkat pendidikan yang sangat tinggi (doktorat), yang menunjukkan bahwa Anda mampu memahami konsep yang kompleks. Gunakan kemampuan ini untuk mempelajari lebih lanjut tentang keamanan siber dan implementasikan pengetahuan ini dalam kehidupan sehari-hari Anda. Meski demikian, jika latar belakang pendidikan Anda bukan dalam bidang teknologi, pertimbangkan untuk mencari bantuan profesional untuk meningkatkan keamanan sistem Anda.
+
+4. Lokasi geografis dan risiko siber terkait:
+    - Sebagai penduduk Medan, Anda perlu memperhatikan ancaman siber lokal dan regional. Indonesia telah menjadi target serangan siber dalam beberapa tahun terakhir, jadi pastikan Anda memperbarui perangkat lunak antivirus dan firewall Anda secara reguler.
+
+Langkah-langkah spesifik:
+
+1. Mulailah dengan memperbarui semua perangkat lunak dan sistem
+        </div>
+        
+        <div class="footer" style="text-align: center; margin-top: 30px;">
+            <p>© Tim Penilai Kesadaran Keamanan Siber. Semua hak dilindungi.</p>
+        </div>
+    </div>
+</body>
+</html> 

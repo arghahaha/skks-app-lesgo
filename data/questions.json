@@ -1,0 +1,60 @@
+{
+    "questions": [
+        {
+            "id": "q1",
+            "text": "Saya secara rutin memperbarui kata sandi untuk akun online saya",
+            "category": "Manajemen Kata Sandi"
+        },
+        {
+            "id": "q2",
+            "text": "Saya menggunakan autentikasi dua faktor ketika tersedia",
+            "category": "Autentikasi"
+        },
+        {
+            "id": "q3",
+            "text": "Saya dapat mengidentifikasi email phishing dan tautan mencurigakan",
+            "category": "Kesadaran Phishing"
+        },
+        {
+            "id": "q4",
+            "text": "Saya selalu memperbarui perangkat lunak dan sistem operasi saya",
+            "category": "Keamanan Sistem"
+        },
+        {
+            "id": "q5",
+            "text": "Saya menggunakan jaringan Wi-Fi yang aman saat mengakses informasi sensitif",
+            "category": "Keamanan Jaringan"
+        },
+        {
+            "id": "q6",
+            "text": "Saya secara rutin membuat cadangan data penting saya",
+            "category": "Perlindungan Data"
+        },
+        {
+            "id": "q7",
+            "text": "Saya memahami pentingnya enkripsi dalam keamanan data",
+            "category": "Pengetahuan Teknis"
+        },
+        {
+            "id": "q8",
+            "text": "Saya mengikuti praktik keamanan saat menggunakan media sosial",
+            "category": "Keamanan Media Sosial"
+        },
+        {
+            "id": "q9",
+            "text": "Saya tahu cara melaporkan insiden keamanan siber",
+            "category": "Penanganan Insiden"
+        },
+        {
+            "id": "q10",
+            "text": "Saya secara rutin memeriksa pengaturan privasi pada akun online saya",
+            "category": "Manajemen Privasi"
+        }
+    ],
+    "likert_scale": [
+        "Sangat Tidak Setuju",
+        "Tidak Setuju",
+        "Setuju",
+        "Sangat Setuju"
+    ]
+} 

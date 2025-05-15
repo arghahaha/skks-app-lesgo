@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Kuesioner Kesadaran Keamanan Siber</h2>
+<div id="error-message" class="alert alert-danger" style="display: none;"></div>
+<form id="questionnaireForm" class="needs-validation" novalidate>
+    {% for question in questions %}
+    <div class="question-card">
+        <h5 class="mb-3">{{ question.text }}</h5>
+        <div class="likert-scale">
+            {% for option in likert_scale %}
+            <div class="likert-option">
+                <input type="radio" 
+                       name="{{ question.id }}" 
+                       id="{{ question.id }}_{{ loop.index0 }}" 
+                       value="{{ loop.index }}" 
+                       class="form-check-input" 
+                       required>
+                <label class="form-check-label" for="{{ question.id }}_{{ loop.index0 }}">
+                    {{ option }}
+                </label>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">Kirim Kuesioner</button>
+</form>
+
+<style>
+.question-card {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.likert-scale {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    gap: 10px;
+}
+
+.likert-option {
+    text-align: center;
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.likert-option:hover {
+    background-color: #f8f9fa;
+}
+
+.likert-option input[type="radio"] {
+    margin-bottom: 8px;
+}
+
+.likert-option label {
+    display: block;
+    font-size: 0.9rem;
+    color: #495057;
+    cursor: pointer;
+}
+
+.likert-option input[type="radio"]:checked + label {
+    color: #0d6efd;
+    font-weight: bold;
+}
+
+.likert-option input[type="radio"]:checked {
+    border-color: #0d6efd;
+    background-color: #0d6efd;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('questionnaireForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!this.checkValidity()) {
+        e.stopPropagation();
+        this.classList.add('was-validated');
+        return;
+    }
+
+    const formData = new FormData(this);
+    const errorMessage = document.getElementById('error-message');
+    const submitButton = this.querySelector('button[type="submit"]');
+    
+    // Disable the button and show loading indicator
+    submitButton.disabled = true;
+    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sedang Memproses...';
+    
+    // Clear any previous error messages
+    errorMessage.style.display = 'none';
+    
+    fetch('/submit_questionnaire', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            // Show results and recommendations
+            const resultsDiv = document.createElement('div');
+            resultsDiv.className = 'mt-4';
+            
+            // Create overall assessment section
+            let assessmentHTML = `
+                <h3 class="mb-4">Hasil Penilaian Kesadaran Keamanan Siber Anda</h3>
+                
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row text-center mb-4">
+                            <div class="col-md-4 mb-3">
+                                <h5>Kesadaran Teknis</h5>
+                                <div class="display-4 text-primary">${data.assessment.technical.percentage.toFixed(1)}%</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <h5>Kesadaran Sosial</h5>
+                                <div class="display-4 text-primary">${data.assessment.social.percentage.toFixed(1)}%</div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <h5>Skor Keseluruhan</h5>
+                                <div class="display-4 text-success">${data.assessment.overall.percentage.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info text-center mb-4">
+                            <h5 class="mb-0">Tingkat Kesadaran Keamanan Siber Anda: <strong>${data.assessment.overall.level}</strong></h5>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <h5 class="border-bottom pb-2 text-primary">Kesadaran Keamanan Siber Teknis</h5>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Indikator</th>
+                                            <th class="text-end">Skor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+            
+            // Add technical indicators
+            for (const [indicator, data] of Object.entries(data.assessment.technical.indicators)) {
+                assessmentHTML += `
+                    <tr>
+                        <td>${indicator}</td>
+                        <td class="text-end fw-bold">${data.percentage.toFixed(1)}%</td>
+                    </tr>`;
+            }
+            
+            assessmentHTML += `
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <h5 class="border-bottom pb-2 text-primary">Kesadaran Keamanan Siber Sosial</h5>
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Indikator</th>
+                                            <th class="text-end">Skor</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>`;
+            
+            // Add social indicators
+            for (const [indicator, data] of Object.entries(data.assessment.social.indicators)) {
+                assessmentHTML += `
+                    <tr>
+                        <td>${indicator}</td>
+                        <td class="text-end fw-bold">${data.percentage.toFixed(1)}%</td>
+                    </tr>`;
+            }
+            
+            assessmentHTML += `
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add recommendations section
+            assessmentHTML += `
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Rekomendasi yang Dipersonalisasi</h5>
+                        <div class="recommendation-text">${data.recommendations}</div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column align-items-center mt-4">
+                    <p class="text-center mb-3">Sertifikat Anda telah dibuat dan berisi hasil penilaian terperinci serta rekomendasi yang dipersonalisasi.</p>
+                    <div id="certificate-download-area">
+                        <a href="/download_certificate/${data.certificate_path}" class="btn btn-success" target="_blank" 
+                           id="download-certificate-btn" onclick="trackCertificateDownload('${data.certificate_path}')">
+                            Unduh Sertifikat
+                        </a>
+                        <div id="certificate-error" class="alert alert-warning mt-2" style="display: none;">
+                            Jika sertifikat tidak dapat dibuka, silakan <button class="btn btn-link p-0" onclick="retryGenerateCertificate()">klik di sini untuk mencoba lagi</button>.
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = assessmentHTML;
+            this.parentNode.appendChild(resultsDiv);
+            this.style.display = 'none';
+        } else {
+            errorMessage.textContent = data.message || 'Terjadi kesalahan saat mengirim kuesioner. Silakan coba lagi.';
+            errorMessage.style.display = 'block';
+            console.error('Error details:', data);
+            
+            // Re-enable the submit button
+            submitButton.disabled = false;
+            submitButton.innerHTML = 'Kirim Kuesioner';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        errorMessage.textContent = 'Terjadi kesalahan saat mengirim kuesioner. Silakan coba lagi.';
+        errorMessage.style.display = 'block';
+        
+        // Re-enable the submit button
+        submitButton.disabled = false;
+        submitButton.innerHTML = 'Kirim Kuesioner';
+    });
+});
+
+// Function to track certificate download attempts
+function trackCertificateDownload(certificatePath) {
+    console.log(`Attempting to download certificate: ${certificatePath}`);
+    
+    // Show the error message after a delay if the download might have failed
+    setTimeout(() => {
+        document.getElementById('certificate-error').style.display = 'block';
+    }, 3000);
+}
+
+// Function to retry certificate generation
+function retryGenerateCertificate() {
+    const downloadBtn = document.getElementById('download-certificate-btn');
+    const errorArea = document.getElementById('certificate-error');
+    
+    if (downloadBtn) {
+        const certificatePath = downloadBtn.href.split('/').pop();
+        console.log(`Retrying certificate download for: ${certificatePath}`);
+        
+        // You could implement a server-side retry here if needed
+        
+        // For now, just try the download again
+        window.open(downloadBtn.href, '_blank');
+    }
+}
+</script>
+{% endblock %} 
