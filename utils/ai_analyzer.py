@@ -27,7 +27,7 @@ def analyze_responses(personal_data, responses):
         String containing personalized recommendations
     """
     # Initialize client with minimal configuration
-    client = OpenAI()
+    client = OpenAI(api_key=api_key)
     
     # Format responses for better LLM understanding
     formatted_responses = []
