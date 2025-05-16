@@ -9,11 +9,15 @@ import pandas as pd
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('ai-analyzer')
 
+# Load environment variables from .env file
 load_dotenv()
 
 # Configure OpenAI
 api_key = os.getenv('OPENAI_API_KEY')
-logger.info(f"API Key loaded: {api_key[:8] if api_key and len(api_key) >= 8 else 'Not Found'}...")
+if not api_key:
+    raise ValueError("OPENAI_API_KEY environment variable is not set. Please set it in your .env file.")
+
+logger.info(f"API Key loaded: {api_key[:8]}...")
 
 def analyze_responses(personal_data, responses):
     """
@@ -26,7 +30,7 @@ def analyze_responses(personal_data, responses):
     Returns:
         String containing personalized recommendations
     """
-    # Initialize client with minimal configuration
+    # Initialize client with API key
     client = OpenAI(api_key=api_key)
     
     # Format responses for better LLM understanding
