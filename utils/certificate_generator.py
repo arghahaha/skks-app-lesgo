@@ -157,42 +157,8 @@ def generate_certificate(personal_data, responses):
         logger.info("Getting AI analysis and recommendations...")
         ai_analysis = analyze_responses(personal_data, responses)
         
-        # Parse AI analysis into sections
-        sections = ai_analysis.split('\n\n')
-        interpretation = ""
-        strengths = []
-        weaknesses = []
-        general_recommendations = []
-        technical_recommendations = []
-        social_recommendations = []
-        implementation_steps = []
-        
-        current_section = None
-        for section in sections:
-            if "TINDAKAN PENTING" in section:
-                current_section = "tindakan"
-                technical_recommendations.extend([line.strip('- ') for line in section.split('\n') if line.strip().startswith('-')])
-            elif "PENGUATAN KEAMANAN" in section:
-                current_section = "penguatan"
-                general_recommendations.extend([line.strip('- ') for line in section.split('\n') if line.strip().startswith('-')])
-            elif "PELATIHAN & PENGEMBANGAN" in section:
-                current_section = "pelatihan"
-                implementation_steps.extend([line.strip('- ') for line in section.split('\n') if line.strip().startswith('-')])
-            elif "ALAT & SUMBER DAYA" in section:
-                current_section = "alat"
-                technical_recommendations.extend([line.strip('- ') for line in section.split('\n') if line.strip().startswith('-')])
-            elif current_section == "tindakan":
-                weaknesses.append(section.strip())
-            elif current_section == "penguatan":
-                strengths.append(section.strip())
-        
-        # Generate interpretation based on assessment results and AI analysis
-        interpretation = f"Berdasarkan hasil penilaian, Anda memiliki tingkat kesadaran keamanan siber {assessment_results['overall']['level'].lower()} ({assessment_results['overall']['percentage']:.1f}%). "
-        interpretation += f"Skor kesadaran teknis Anda adalah {assessment_results['technical']['percentage']:.1f}% dan kesadaran sosial {assessment_results['social']['percentage']:.1f}%. "
-        
-        # Add AI-generated interpretation
-        if ai_analysis:
-            interpretation += "\n\n" + ai_analysis.split('\n\n')[0] if ai_analysis else ""
+        # Generate interpretation
+        interpretation, strengths, weaknesses = generate_interpretation(assessment_results)
         
         # Format the detailed assessment for better display
         technical_indicators = []
@@ -222,13 +188,7 @@ def generate_certificate(personal_data, responses):
             'technical_indicators': technical_indicators,
             'social_indicators': social_indicators,
             'interpretation': interpretation,
-            'strengths': strengths,
-            'weaknesses': weaknesses,
-            'detailed_analysis': ai_analysis,
-            'general_recommendations': general_recommendations,
-            'technical_recommendations': technical_recommendations,
-            'social_recommendations': social_recommendations,
-            'implementation_steps': implementation_steps
+            'detailed_analysis': ai_analysis
         }
         
         # Render template

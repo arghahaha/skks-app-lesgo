@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Sertifikat Kesadaran Keamanan Siber</title>
@@ -9,7 +9,7 @@
             margin: 0;
         }
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
             color: #333;
@@ -17,7 +17,7 @@
         .certificate {
             border: 2px solid #000;
             padding: 20px;
-            min-height: 29.7cm; /* A4 height */
+            min-height: 29.7cm;
             position: relative;
             page-break-after: always;
             box-sizing: border-box;
@@ -54,6 +54,20 @@
         .score-value {
             font-size: 20px;
             color: #2c3e50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
         }
         .interpretation {
             margin-top: 30px;
@@ -99,39 +113,17 @@
             text-align: justify;
             padding: 0 10px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 10px 0;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        th {
-            background-color: #f8f9fa;
-            font-weight: bold;
-        }
-        .page-break {
-            page-break-before: always;
-        }
-        .strength-weakness {
-            margin: 15px 0;
-            padding: 10px;
-            background-color: #fff;
-            border-radius: 5px;
-        }
-        .strength {
-            color: #27ae60;
-        }
-        .weakness {
-            color: #c0392b;
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            position: absolute;
+            bottom: 20px;
+            width: calc(100% - 40px);
         }
     </style>
 </head>
 <body>
-    <!-- First Page -->
+    <!-- Page 1: Assessment Results -->
     <div class="certificate">
         <div class="header">
             <div class="title">Sertifikat Penilaian Kesadaran Keamanan Siber</div>
@@ -141,7 +133,7 @@
             <div>{{ domicile }}</div>
             <div>Tanggal: {{ date }}</div>
         </div>
-
+        
         <div class="content">
             <div class="score-section">
                 <div class="score-title">Hasil Penilaian Kesadaran Keamanan Siber:</div>
@@ -196,68 +188,28 @@
                 </table>
             </div>
         </div>
+
+        <div class="footer">
+            <p>Dokumen ini menyatakan bahwa pemegang telah menyelesaikan penilaian kesadaran keamanan siber</p>
+        </div>
     </div>
 
-    <!-- Second Page - Interpretation -->
+    <!-- Page 2: Interpretation -->
     <div class="certificate">
         <div class="interpretation">
             <div class="interpretation-title">Interpretasi Hasil Penilaian</div>
             <div class="interpretation-content">
-                <h3>Karakteristik Tingkat Kesadaran Keamanan Siber</h3>
-                <p>{{ interpretation }}</p>
-
-                <div class="strength-weakness">
-                    <h4 class="strength">Kekuatan:</h4>
-                    <ul>
-                        {% for strength in strengths %}
-                        <li>{{ strength }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <div class="strength-weakness">
-                    <h4 class="weakness">Area yang Perlu Ditingkatkan:</h4>
-                    <ul>
-                        {% for weakness in weaknesses %}
-                        <li>{{ weakness }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-
-                <h3>Analisis Detail:</h3>
-                <p>{{ detailed_analysis }}</p>
+                {{ interpretation }}
             </div>
         </div>
     </div>
 
-    <!-- Third Page - Recommendations -->
+    <!-- Page 3: AI Recommendations -->
     <div class="certificate">
         <div class="recommendations">
-            <div class="recommendations-title">Rekomendasi Perilaku Siber</div>
+            <div class="recommendations-title">Rekomendasi Berdasarkan Tingkat Kesadaran</div>
             <div class="recommendations-content">
-                <h3>Rekomendasi Umum:</h3>
-                <p>{{ general_recommendations }}</p>
-
-                <h3>Rekomendasi Teknis:</h3>
-                <ul>
-                    {% for rec in technical_recommendations %}
-                    <li>{{ rec }}</li>
-                    {% endfor %}
-                </ul>
-
-                <h3>Rekomendasi Sosial:</h3>
-                <ul>
-                    {% for rec in social_recommendations %}
-                    <li>{{ rec }}</li>
-                    {% endfor %}
-                </ul>
-
-                <h3>Langkah-langkah Implementasi:</h3>
-                <ol>
-                    {% for step in implementation_steps %}
-                    <li>{{ step }}</li>
-                    {% endfor %}
-                </ol>
+                {{ detailed_analysis }}
             </div>
         </div>
     </div>
