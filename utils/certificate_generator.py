@@ -4,7 +4,7 @@ import os
 import logging
 import traceback
 from datetime import datetime
-from utils.ai_analyzer import analyze_responses
+from utils.ai_analyzer import analyze_responses, get_llm_response
 from utils.assessment_evaluator import evaluate_responses
 
 # Configure logging
@@ -12,43 +12,89 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger('certificate-generator')
 
 def generate_interpretation(results):
-    """Generate detailed interpretation of assessment results"""
-    interpretation = ""
-    strengths = []
-    weaknesses = []
-    
-    # Interpret overall level
-    level = results['overall']['level']
-    percentage = results['overall']['percentage']
-    
-    if level == "Sangat Baik":
-        interpretation = f"Berdasarkan hasil penilaian, Anda memiliki tingkat kesadaran keamanan siber yang sangat baik ({percentage:.1f}%). "
-        interpretation += "Anda menunjukkan pemahaman yang komprehensif terhadap aspek teknis dan sosial dari keamanan siber."
-    elif level == "Baik":
-        interpretation = f"Hasil penilaian menunjukkan tingkat kesadaran keamanan siber yang baik ({percentage:.1f}%). "
-        interpretation += "Anda memiliki pemahaman yang cukup baik tentang keamanan siber, namun masih ada beberapa area yang dapat ditingkatkan."
-    elif level == "Kurang Baik":
-        interpretation = f"Tingkat kesadaran keamanan siber Anda berada pada kategori kurang baik ({percentage:.1f}%). "
-        interpretation += "Beberapa aspek keamanan siber perlu mendapat perhatian lebih untuk meningkatkan kesadaran Anda."
-    else:
-        interpretation = f"Tingkat kesadaran keamanan siber Anda berada pada kategori buruk ({percentage:.1f}%). "
-        interpretation += "Penting untuk meningkatkan pemahaman dan praktik keamanan siber Anda."
+    """Generate detailed interpretation of assessment results using LLM"""
+    try:
+        logger.info("Generating interpretation using LLM...")
+        
+        # Prepare data for LLM
+        assessment_data = {
+            'overall': {
+                'level': results['overall']['level'],
+                'percentage': results['overall']['percentage']
+            },
+            'technical': {
+                'percentage': results['technical']['percentage'],
+                'indicators': results['technical']['indicators']
+            },
+            'social': {
+                'percentage': results['social']['percentage'],
+                'indicators': results['social']['indicators']
+            }
+        }
+        
+        # Create prompt for LLM
+        prompt = f"""Berdasarkan hasil penilaian kesadaran keamanan siber berikut, berikan interpretasi yang komprehensif:
 
-    # Analyze technical indicators
-    for indicator, data in results['technical']['indicators'].items():
-        if data['percentage'] >= 75:
-            strengths.append(f"Memiliki pemahaman yang baik tentang {indicator}")
-        elif data['percentage'] < 50:
-            weaknesses.append(f"Perlu meningkatkan pemahaman tentang {indicator}")
+Hasil Keseluruhan:
+- Tingkat Kesadaran: {assessment_data['overall']['level']} ({assessment_data['overall']['percentage']:.1f}%)
+- Kesadaran Teknis: {assessment_data['technical']['percentage']:.1f}%
+- Kesadaran Sosial: {assessment_data['social']['percentage']:.1f}%
 
-    # Analyze social indicators
-    for indicator, data in results['social']['indicators'].items():
-        if data['percentage'] >= 75:
-            strengths.append(f"Memiliki kesadaran yang baik tentang {indicator}")
-        elif data['percentage'] < 50:
-            weaknesses.append(f"Perlu meningkatkan kesadaran tentang {indicator}")
+Detail Indikator Teknis:
+{chr(10).join([f"- {indicator}: {data['percentage']:.1f}%" for indicator, data in assessment_data['technical']['indicators'].items()])}
 
-    return interpretation, strengths, weaknesses
+Detail Indikator Sosial:
+{chr(10).join([f"- {indicator}: {data['percentage']:.1f}%" for indicator, data in assessment_data['social']['indicators'].items()])}
+
+Berdasarkan data di atas, berikan interpretasi yang mencakup:
+1. Analisis keseluruhan tingkat kesadaran
+2. Analisis detail untuk setiap indikator teknis dan sosial
+3. Identifikasi kekuatan dan area yang perlu ditingkatkan
+4. Rekomendasi spesifik untuk peningkatan
+
+Format interpretasi:
+- Gunakan bahasa yang profesional namun mudah dipahami
+- Berikan contoh konkret untuk setiap poin
+- Fokus pada aspek praktis yang dapat diterapkan
+- Berikan saran yang spesifik dan actionable
+"""
+
+        # Get interpretation from LLM
+        interpretation = get_llm_response(prompt)
+        
+        # Extract strengths and weaknesses from interpretation
+        strengths = []
+        weaknesses = []
+        
+        # Analyze technical indicators
+        for indicator, data in results['technical']['indicators'].items():
+            if data['percentage'] >= 75:
+                strengths.append(f"Memiliki pemahaman yang baik tentang {indicator}")
+            elif data['percentage'] < 50:
+                weaknesses.append(f"Perlu meningkatkan pemahaman tentang {indicator}")
+
+        # Analyze social indicators
+        for indicator, data in results['social']['indicators'].items():
+            if data['percentage'] >= 75:
+                strengths.append(f"Memiliki kesadaran yang baik tentang {indicator}")
+            elif data['percentage'] < 50:
+                weaknesses.append(f"Perlu meningkatkan kesadaran tentang {indicator}")
+
+        return interpretation, strengths, weaknesses
+        
+    except Exception as e:
+        logger.error(f"Error generating interpretation: {str(e)}")
+        logger.error(traceback.format_exc())
+        
+        # Fallback to basic interpretation if LLM fails
+        basic_interpretation = f"""Hasil penilaian kesadaran keamanan siber menunjukkan tingkat {results['overall']['level']} ({results['overall']['percentage']:.1f}%).
+
+Kesadaran Teknis: {results['technical']['percentage']:.1f}%
+Kesadaran Sosial: {results['social']['percentage']:.1f}%
+
+Detail indikator dapat dilihat pada tabel di halaman sebelumnya."""
+        
+        return basic_interpretation, [], []
 
 def generate_recommendations(results, personal_data):
     """Generate personalized recommendations based on assessment results"""
