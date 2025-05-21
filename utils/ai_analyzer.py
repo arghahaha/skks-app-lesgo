@@ -60,54 +60,47 @@ def analyze_responses(personal_data, responses):
     
     # Prepare the context-based prompt without personal identifiers
     context_prompt = f"""
-    Sebagai ahli keamanan siber, analisis data dan respons kuesioner responden berikut:
-    
-    Profil Responden:
-    - Pendidikan: {personal_data['education']}
-    - Lokasi: {personal_data['domicile']}
-    - Jenis Kelamin: {personal_data['gender']}
+    Sebagai pakar keamanan siber, analisis respons kuesioner berikut:
     
     Respons Kuesioner:
     {''.join(formatted_responses)}
     
     Tugas Anda:
-    1. Analisis setiap jawaban kuesioner dengan cermat
-    2. Identifikasi area yang perlu ditingkatkan berdasarkan jawaban "Tidak Setuju" dan "Sangat Tidak Setuju"
-    3. Berikan rekomendasi yang spesifik dan sesuai dengan:
-       - Tingkat pendidikan responden
-       - Jawaban spesifik yang diberikan
-       - Konteks lokasi responden
-    
-    Format rekomendasi:
+    Berikan satu rekomendasi praktis dan edukatif untuk masing-masing kategori tingkat kesadaran keamanan siber:
+    • Sangat rendah
+    • Rendah
+    • Sedang
+    • Tinggi
 
-    1. TINDAKAN PENTING (Berdasarkan Jawaban Lemah)
-       - Fokus pada 2-3 area yang mendapat jawaban "Tidak Setuju" atau "Sangat Tidak Setuju"
-       - Berikan langkah konkret untuk meningkatkan area tersebut
-       - Contoh: Jika responden tidak menggunakan kata sandi yang berbeda, berikan panduan membuat dan mengelola kata sandi yang aman
+    Setiap rekomendasi harus:
+    • Praktis dan dapat langsung diterapkan
+    • Mengedukasi dengan menjelaskan alasan pentingnya
+    • Disampaikan secara formal dan instruktif
 
-    2. PENGUATAN KEAMANAN (Berdasarkan Profil)
-       - Berikan 3-4 praktik keamanan yang sesuai dengan tingkat pendidikan
-       - Sesuaikan kompleksitas rekomendasi dengan latar belakang responden
-       - Contoh: Untuk responden dengan pendidikan dasar, fokus pada praktik keamanan dasar yang mudah dipahami
+    Format hasil:
+    1. Tingkat Kesadaran Sangat Rendah
+       • Rekomendasi: [Rekomendasi spesifik]
+       • Alasan: [Penjelasan pentingnya]
+       • Langkah Implementasi: [Langkah-langkah praktis]
 
-    3. PELATIHAN & PENGEMBANGAN
-       - Rekomendasikan sumber belajar yang sesuai dengan:
-         * Tingkat pendidikan responden
-         * Area yang perlu ditingkatkan
-         * Ketersediaan sumber di lokasi responden
-       - Berikan link atau nama platform yang dapat diakses
+    2. Tingkat Kesadaran Rendah
+       • Rekomendasi: [Rekomendasi spesifik]
+       • Alasan: [Penjelasan pentingnya]
+       • Langkah Implementasi: [Langkah-langkah praktis]
 
-    4. ALAT & SUMBER DAYA
-       - Rekomendasikan alat yang:
-         * Mudah digunakan sesuai tingkat pendidikan
-         * Gratis atau terjangkau
-         * Tersedia di lokasi responden
-       - Berikan panduan langkah demi langkah penggunaan
+    3. Tingkat Kesadaran Sedang
+       • Rekomendasi: [Rekomendasi spesifik]
+       • Alasan: [Penjelasan pentingnya]
+       • Langkah Implementasi: [Langkah-langkah praktis]
+
+    4. Tingkat Kesadaran Tinggi
+       • Rekomendasi: [Rekomendasi spesifik]
+       • Alasan: [Penjelasan pentingnya]
+       • Langkah Implementasi: [Langkah-langkah praktis]
 
     Catatan Penting:
-    - Setiap rekomendasi HARUS terkait langsung dengan jawaban kuesioner
-    - Hindari rekomendasi umum yang tidak relevan dengan jawaban
-    - Sesuaikan bahasa dan kompleksitas dengan tingkat pendidikan
+    - Jangan tampilkan skor dalam hasil
+    - Format hasil dalam poin-poin
     - Berikan contoh konkret yang dapat langsung diterapkan
     - Fokus pada area yang mendapat skor rendah dalam kuesioner
     """
@@ -126,7 +119,7 @@ def analyze_responses(personal_data, responses):
             response = client.chat.completions.create(
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "Anda adalah ahli keamanan siber yang memberikan rekomendasi yang sangat spesifik dan sesuai dengan jawaban kuesioner responden. Fokus pada area yang mendapat skor rendah dan berikan solusi praktis yang sesuai dengan latar belakang responden."},
+                    {"role": "system", "content": "Anda adalah pakar keamanan siber yang memberikan rekomendasi praktis dan edukatif berdasarkan tingkat kesadaran keamanan siber responden. Berikan rekomendasi yang dapat langsung diterapkan dan disertai penjelasan pentingnya."},
                     {"role": "user", "content": context_prompt}
                 ],
                 temperature=0.7,
