@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import logging
 import time
 import pandas as pd
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,7 +20,81 @@ if not api_key:
 
 logger.info(f"API Key loaded: {api_key[:8]}...")
 
+def get_llm_response(prompt):
+    """
+    Get response from LLM for interpretation generation
+    
+    Args:
+        prompt: String containing the prompt for LLM
+        
+    Returns:
+        String containing the LLM response
+    """
+    try:
+        response = OpenAI(api_key=api_key).chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Anda adalah asisten yang ahli dalam menganalisis hasil penilaian kesadaran keamanan siber. Berikan interpretasi yang komprehensif, profesional, dan mudah dipahami."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        logger.error(f"Error getting LLM response: {str(e)}")
+        raise
+
 def analyze_responses(personal_data, responses):
+    """
+    Analyze questionnaire responses using LLM
+    
+    Args:
+        personal_data: Dictionary containing personal information
+        responses: Dictionary containing questionnaire responses
+        
+    Returns:
+        String containing the analysis and recommendations
+    """
+    try:
+        # Prepare data for LLM
+        analysis_data = {
+            'personal_data': personal_data,
+            'responses': responses
+        }
+        
+        # Create prompt for LLM
+        prompt = f"""Berdasarkan data berikut, berikan analisis dan rekomendasi untuk meningkatkan kesadaran keamanan siber:
+
+Data Pribadi:
+- Nama: {personal_data['name']}
+- Pendidikan: {personal_data['education']}
+- Domisili: {personal_data['domicile']}
+
+Jawaban Kuesioner:
+{json.dumps(responses, indent=2)}
+
+Berdasarkan data di atas, berikan:
+1. Analisis kesadaran keamanan siber secara keseluruhan
+2. Rekomendasi spesifik untuk meningkatkan kesadaran keamanan siber
+3. Langkah-langkah praktis yang dapat diterapkan dalam kehidupan sehari-hari
+
+Format rekomendasi:
+- Gunakan bahasa yang profesional namun mudah dipahami
+- Berikan contoh konkret untuk setiap rekomendasi
+- Fokus pada aspek praktis yang dapat diterapkan
+- Sesuaikan rekomendasi dengan tingkat pendidikan dan konteks domisili
+"""
+
+        # Get analysis from LLM
+        analysis = get_llm_response(prompt)
+        return analysis
+        
+    except Exception as e:
+        logger.error(f"Error analyzing responses: {str(e)}")
+        return "Terjadi kesalahan dalam menganalisis jawaban. Silakan coba lagi nanti."
+
+def analyze_responses_old(personal_data, responses):
     """
     Analyze questionnaire responses using OpenAI API
     
@@ -117,7 +192,7 @@ def analyze_responses(personal_data, responses):
             
             # Make API call with timeout
             response = client.chat.completions.create(
-                model="gpt-4",
+                model="GPT-3.5-turbo",
                 messages=[
                     {"role": "system", "content": "Anda adalah pakar keamanan siber yang memberikan rekomendasi praktis dan edukatif berdasarkan tingkat kesadaran keamanan siber responden. Berikan rekomendasi yang dapat langsung diterapkan dan disertai penjelasan pentingnya."},
                     {"role": "user", "content": context_prompt}
