@@ -6,6 +6,8 @@ import traceback
 from datetime import datetime
 from utils.ai_analyzer import analyze_responses, get_llm_response
 from utils.assessment_evaluator import evaluate_responses
+from PIL import Image, ImageDraw, ImageFont
+from fpdf import FPDF
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -291,4 +293,78 @@ def generate_certificate(personal_data, responses):
         logger.error(traceback.format_exc())
         
         # Return a default certificate name to prevent UI errors
-        return "certificate_error.pdf" 
+        return "certificate_error.pdf"
+
+def generate_certificate_with_template(
+    personal_data, 
+    assessment_results, 
+    output_basename="certificate"
+):
+    """
+    Generate certificate using PNG template, write data, save as PNG and PDF.
+    Args:
+        personal_data: dict, must contain 'name'
+        assessment_results: dict, must contain 'technical', 'social', 'overall', and indicator scores
+        output_basename: str, base filename (without extension)
+    Returns:
+        (png_path, pdf_path)
+    """
+    # Path setup
+    template_path = os.path.join("certificate_template", "certificate_template.png")
+    output_dir = "certificates"
+    os.makedirs(output_dir, exist_ok=True)
+    png_path = os.path.join(output_dir, f"{output_basename}.png")
+    pdf_path = os.path.join(output_dir, f"{output_basename}.pdf")
+
+    # Load template
+    image = Image.open(template_path).convert("RGBA")
+    draw = ImageDraw.Draw(image)
+
+    # Load fonts
+    font_lucida = os.path.join(os.path.dirname(__file__), '..', 'Lucida Calligraphy Font.ttf')
+    font_montserrat = os.path.join(os.path.dirname(__file__), '..', 'Montserrat-Regular.ttf')
+    if os.path.exists(font_lucida):
+        font_nama = ImageFont.truetype(font_lucida, 30)
+    else:
+        font_nama = ImageFont.load_default()
+    if os.path.exists(font_montserrat):
+        font_angka = ImageFont.truetype(font_montserrat, 11)
+    else:
+        font_angka = ImageFont.load_default()
+
+    # Konversi nilai ke skala 1-10 dengan 2 digit desimal
+    def to_scale_10(val):
+        return round((float(val) / 100) * 10, 2)
+
+    # Nama (Lucida Calligraphy)
+    draw.text((400, 250), personal_data.get("name", ""), fill="black", font=font_nama)
+
+    # Nilai teknis & sosial (Montserrat)
+    draw.text((200, 400), f"{to_scale_10(assessment_results['technical']['percentage']):.2f}", fill="black", font=font_angka)
+    draw.text((600, 400), f"{to_scale_10(assessment_results['social']['percentage']):.2f}", fill="black", font=font_angka)
+
+    # Nilai individu & predikat (Montserrat)
+    draw.text((400, 350), f"{to_scale_10(assessment_results['overall']['percentage']):.2f}", fill="black", font=font_angka)
+    draw.text((400, 300), assessment_results['overall']['level'], fill="black", font=font_angka)
+
+    # Skor indikator teknis (Montserrat)
+    y_start = 700
+    for idx, (indikator, nilai) in enumerate(assessment_results['technical']['indicators'].items()):
+        nilai_angka = nilai['percentage'] if isinstance(nilai, dict) and 'percentage' in nilai else nilai
+        draw.text((300, y_start + idx*40), f"{to_scale_10(nilai_angka):.2f}", fill="black", font=font_angka)
+
+    # Skor indikator sosial (Montserrat)
+    for idx, (indikator, nilai) in enumerate(assessment_results['social']['indicators'].items()):
+        nilai_angka = nilai['percentage'] if isinstance(nilai, dict) and 'percentage' in nilai else nilai
+        draw.text((600, y_start + idx*40), f"{to_scale_10(nilai_angka):.2f}", fill="black", font=font_angka)
+
+    # Simpan PNG
+    image.save(png_path)
+
+    # Konversi ke PDF
+    pdf = FPDF(orientation='L', unit='pt', format=image.size)
+    pdf.add_page()
+    pdf.image(png_path, 0, 0, image.size[0], image.size[1])
+    pdf.output(pdf_path)
+
+    return png_path, pdf_path 

@@ -4,8 +4,8 @@ from datetime import datetime
 import os
 import logging
 from dotenv import load_dotenv
-from utils.certificate_generator import generate_certificate
-from utils.ai_analyzer import analyze_responses
+from utils.certificate_generator import generate_certificate, generate_certificate_with_template
+from utils.ai_analyzer import analyze_responses, get_llm_response
 import traceback
 from utils.assessment_evaluator import evaluate_responses
 
@@ -194,18 +194,26 @@ def submit_questionnaire():
         # Generate certificate
         try:
             logger.info("Generating certificate...")
-            certificate_path = generate_certificate(personal_data, responses)
-            logger.info(f"Certificate generated: {certificate_path}")
+            basename = f"certificate_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{personal_data['name'].replace(' ', '_')}"
+            png_path, pdf_path = generate_certificate_with_template(personal_data, assessment_results, output_basename=basename)
+            png_filename = os.path.basename(png_path)
+            pdf_filename = os.path.basename(pdf_path)
+            logger.info(f"Certificate generated: {png_path}, {pdf_path}")
         except Exception as cert_error:
             logger.error(f"Error generating certificate: {str(cert_error)}")
             logger.error(f"Certificate error details: {traceback.format_exc()}")
             return jsonify({'status': 'error', 'message': f'Error generating certificate: {str(cert_error)}'}), 500
         
+        # Simpan hasil assessment dan data personal ke session untuk chatbot
+        session['assessment_results'] = assessment_results
+        session['personal_data'] = personal_data
+        
         # Return success response
         logger.info("Returning successful response to client")
         return jsonify({
             'status': 'success',
-            'certificate_path': certificate_path,
+            'certificate_png': png_filename,
+            'certificate_pdf': pdf_filename,
             'recommendations': recommendations,
             'assessment': assessment_results
         })
@@ -252,6 +260,56 @@ def download_certificate(filename):
             'status': 'error',
             'message': f'Error saat mengirim sertifikat: {str(e)}'
         }), 500
+
+@app.route('/preview_certificate/<filename>')
+def preview_certificate(filename):
+    cert_path = os.path.join('certificates', filename)
+    if not os.path.exists(cert_path):
+        return "Certificate not found", 404
+    return send_file(cert_path, mimetype='image/png')
+
+@app.route('/chatbot', methods=['POST'])
+def chatbot():
+    try:
+        data = request.get_json()
+        message = data.get('message', '')
+        if not message:
+            return jsonify({'reply': 'Pertanyaan tidak boleh kosong.'}), 400
+
+        # Ambil hasil assessment dan data personal dari session
+        assessment = session.get('assessment_results')
+        personal_data = session.get('personal_data')
+        if not assessment or not personal_data:
+            return jsonify({'reply': 'Data hasil kuesioner tidak ditemukan. Silakan isi kuesioner terlebih dahulu.'}), 400
+
+        # Siapkan konteks demografi tanpa nama
+        demografi = (
+            f"Usia: {personal_data.get('age', '-')}, "
+            f"Jenis Kelamin: {personal_data.get('gender', '-')}, "
+            f"Domisili: {personal_data.get('domicile', '-')}, "
+            f"Pendidikan Terakhir: {personal_data.get('education', '-')}"
+        )
+        indikator_teknis = ', '.join([f"{k}: {v['percentage']}%" for k, v in assessment['technical']['indicators'].items()])
+        indikator_sosial = ', '.join([f"{k}: {v['percentage']}%" for k, v in assessment['social']['indicators'].items()])
+        context = (
+            f"Latar belakang responden: {demografi}\n"
+            f"Tingkat Kesadaran Siber: {assessment['overall']['level']} ({assessment['overall']['percentage']}%)\n"
+            f"Nilai Teknis: {assessment['technical']['percentage']}%\n"
+            f"Nilai Sosial: {assessment['social']['percentage']}%\n"
+            f"Indikator Teknis: {indikator_teknis}\n"
+            f"Indikator Sosial: {indikator_sosial}\n"
+        )
+        prompt = (
+            f"Berikut adalah hasil kuesioner saya:\n{context}\n"
+            f"Pertanyaan saya: {message}\n"
+            "Berikan jawaban dan rekomendasi yang relevan dan personal sesuai hasil dan latar belakang di atas."
+        )
+
+        reply = get_llm_response(prompt)
+        return jsonify({'reply': reply})
+    except Exception as e:
+        logger.error(f"Error in chatbot endpoint: {str(e)}")
+        return jsonify({'reply': 'Terjadi kesalahan pada server chatbot.'}), 500
 
 if __name__ == '__main__':
     print("🚀 Starting Cybersecurity Awareness Assessment Server...")

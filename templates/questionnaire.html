@@ -28,6 +28,22 @@
     <button type="submit" class="btn btn-primary">Kirim Kuesioner</button>
 </form>
 
+<div id="certificate-preview" style="display:none; text-align:center; margin-top:2em;">
+  <h3>Preview Sertifikat Anda</h3>
+  <img id="certificate-img" src="" style="max-width:100%;border:1px solid #ccc;">
+  <br>
+  <a id="download-certificate" href="" download class="btn btn-primary" style="margin-top:1em;">Download PDF Sertifikat</a>
+</div>
+
+<div id="chatbot-section" style="display:none; margin-top:2em;">
+  <h3>Konsultasi Hasil Kuesioner</h3>
+  <div id="chatbot-messages" style="border:1px solid #ccc; padding:1em; height:200px; overflow-y:auto; background:#fafafa;"></div>
+  <form id="chatbot-form" style="margin-top:1em; display:flex;">
+    <input type="text" id="chatbot-input" class="form-control" placeholder="Tulis pertanyaan Anda..." style="flex:1;">
+    <button type="submit" class="btn btn-success" style="margin-left:0.5em;">Kirim</button>
+  </form>
+</div>
+
 <style>
 .question-card {
     background-color: #fff;
@@ -96,10 +112,6 @@ document.getElementById('questionnaireForm').addEventListener('submit', function
     const errorMessage = document.getElementById('error-message');
     const submitButton = this.querySelector('button[type="submit"]');
     
-    // Disable the button and show loading indicator
-    submitButton.disabled = true;
-    submitButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sedang Memproses...';
-    
     // Clear any previous error messages
     errorMessage.style.display = 'none';
     
@@ -115,132 +127,25 @@ document.getElementById('questionnaireForm').addEventListener('submit', function
     })
     .then(data => {
         if (data.status === 'success') {
-            // Show results and recommendations
-            const resultsDiv = document.createElement('div');
-            resultsDiv.className = 'mt-4';
-            
-            // Create overall assessment section
-            let assessmentHTML = `
-                <h3 class="mb-4">Hasil Penilaian Kesadaran Keamanan Siber Anda</h3>
-                
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row text-center mb-4">
-                            <div class="col-md-4 mb-3">
-                                <h5>Kesadaran Teknis</h5>
-                                <div class="display-4 text-primary">${data.assessment.technical.percentage.toFixed(1)}%</div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <h5>Kesadaran Sosial</h5>
-                                <div class="display-4 text-primary">${data.assessment.social.percentage.toFixed(1)}%</div>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <h5>Skor Keseluruhan</h5>
-                                <div class="display-4 text-success">${data.assessment.overall.percentage.toFixed(1)}%</div>
-                            </div>
-                        </div>
-                        
-                        <div class="alert alert-info text-center mb-4">
-                            <h5 class="mb-0">Tingkat Kesadaran Keamanan Siber Anda: <strong>${data.assessment.overall.level}</strong></h5>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-4">
-                                <h5 class="border-bottom pb-2 text-primary">Kesadaran Keamanan Siber Teknis</h5>
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Indikator</th>
-                                            <th class="text-end">Skor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
-            
-            // Add technical indicators
-            for (const [indicator, data] of Object.entries(data.assessment.technical.indicators)) {
-                assessmentHTML += `
-                    <tr>
-                        <td>${indicator}</td>
-                        <td class="text-end fw-bold">${data.percentage.toFixed(1)}%</td>
-                    </tr>`;
-            }
-            
-            assessmentHTML += `
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <h5 class="border-bottom pb-2 text-primary">Kesadaran Keamanan Siber Sosial</h5>
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Indikator</th>
-                                            <th class="text-end">Skor</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>`;
-            
-            // Add social indicators
-            for (const [indicator, data] of Object.entries(data.assessment.social.indicators)) {
-                assessmentHTML += `
-                    <tr>
-                        <td>${indicator}</td>
-                        <td class="text-end fw-bold">${data.percentage.toFixed(1)}%</td>
-                    </tr>`;
-            }
-            
-            assessmentHTML += `
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Add recommendations section
-            assessmentHTML += `
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Rekomendasi yang Dipersonalisasi</h5>
-                        <div class="recommendation-text">${data.recommendations}</div>
-                    </div>
-                </div>
-                <div class="d-flex flex-column align-items-center mt-4">
-                    <p class="text-center mb-3">Sertifikat Anda telah dibuat dan berisi hasil penilaian terperinci serta rekomendasi yang dipersonalisasi.</p>
-                    <div id="certificate-download-area">
-                        <a href="/download_certificate/${data.certificate_path}" class="btn btn-success" target="_blank" 
-                           id="download-certificate-btn" onclick="trackCertificateDownload('${data.certificate_path}')">
-                            Unduh Sertifikat
-                        </a>
-                        <div id="certificate-error" class="alert alert-warning mt-2" style="display: none;">
-                            Jika sertifikat tidak dapat dibuka, silakan <button class="btn btn-link p-0" onclick="retryGenerateCertificate()">klik di sini untuk mencoba lagi</button>.
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            resultsDiv.innerHTML = assessmentHTML;
-            this.parentNode.appendChild(resultsDiv);
-            this.style.display = 'none';
+            // Tampilkan preview sertifikat
+            document.getElementById('certificate-img').src = '/preview_certificate/' + data.certificate_png;
+            document.getElementById('download-certificate').href = '/download_certificate/' + data.certificate_pdf;
+            document.getElementById('certificate-preview').style.display = 'block';
+
+            // Setelah preview, tampilkan chatbot
+            document.getElementById('chatbot-section').style.display = 'block';
+            // (Opsional) Scroll ke preview sertifikat
+            document.getElementById('certificate-preview').scrollIntoView({behavior: 'smooth'});
         } else {
             errorMessage.textContent = data.message || 'Terjadi kesalahan saat mengirim kuesioner. Silakan coba lagi.';
             errorMessage.style.display = 'block';
             console.error('Error details:', data);
-            
-            // Re-enable the submit button
-            submitButton.disabled = false;
-            submitButton.innerHTML = 'Kirim Kuesioner';
         }
     })
     .catch(error => {
         console.error('Error:', error);
         errorMessage.textContent = 'Terjadi kesalahan saat mengirim kuesioner. Silakan coba lagi.';
         errorMessage.style.display = 'block';
-        
-        // Re-enable the submit button
-        submitButton.disabled = false;
-        submitButton.innerHTML = 'Kirim Kuesioner';
     });
 });
 
@@ -269,5 +174,34 @@ function retryGenerateCertificate() {
         window.open(downloadBtn.href, '_blank');
     }
 }
+
+document.getElementById('chatbot-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const input = document.getElementById('chatbot-input');
+    const message = input.value.trim();
+    if (!message) return;
+
+    // Tampilkan pesan user
+    const chatbox = document.getElementById('chatbot-messages');
+    chatbox.innerHTML += `<div><b>Anda:</b> ${message}</div>`;
+    input.value = '';
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+    // Kirim ke backend
+    fetch('/chatbot', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatbox.innerHTML += `<div><b>Chatbot:</b> ${data.reply}</div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+    })
+    .catch(() => {
+        chatbox.innerHTML += `<div><b>Chatbot:</b> Terjadi kesalahan pada server.</div>`;
+        chatbox.scrollTop = chatbox.scrollHeight;
+    });
+});
 </script>
 {% endblock %} 
