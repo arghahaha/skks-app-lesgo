@@ -324,47 +324,68 @@ def generate_certificate_with_template(
     font_lucida = os.path.join(os.path.dirname(__file__), '..', 'Lucida Calligraphy Font.ttf')
     font_montserrat = os.path.join(os.path.dirname(__file__), '..', 'Montserrat-Regular.ttf')
     if os.path.exists(font_lucida):
-        font_nama = ImageFont.truetype(font_lucida, 30)
+        font_nama = ImageFont.truetype(font_lucida, 70)
     else:
         font_nama = ImageFont.load_default()
     if os.path.exists(font_montserrat):
-        font_angka = ImageFont.truetype(font_montserrat, 11)
+        font_angka = ImageFont.truetype(font_montserrat, 22)
+        font_angka_besar = ImageFont.truetype(font_montserrat, 22)
+        font_angka_kks = ImageFont.truetype(font_montserrat, 24)
     else:
         font_angka = ImageFont.load_default()
+        font_angka_besar = ImageFont.load_default()
+        font_angka_kks = ImageFont.load_default()
 
-    # Konversi nilai ke skala 1-10 dengan 2 digit desimal
-    def to_scale_10(val):
-        return round((float(val) / 100) * 10, 2)
+    # Konversi nilai ke skala 1-100 dengan 2 digit desimal
+    def to_scale_100(val):
+        return round(float(val), 2)
 
-    # Nama (Lucida Calligraphy)
-    draw.text((400, 250), personal_data.get("name", ""), fill="black", font=font_nama)
+    # Nama (Lucida Calligraphy, rata tengah)
+    nama = personal_data.get("name", "")
+    bbox_nama = font_nama.getbbox(nama)
+    w_nama = bbox_nama[2] - bbox_nama[0]
+    x_nama = (image.width - w_nama) // 2
+    draw.text((x_nama, 325), nama, fill="black", font=font_nama)
 
-    # Nilai teknis & sosial (Montserrat)
-    draw.text((200, 400), f"{to_scale_10(assessment_results['technical']['percentage']):.2f}", fill="black", font=font_angka)
-    draw.text((600, 400), f"{to_scale_10(assessment_results['social']['percentage']):.2f}", fill="black", font=font_angka)
+    # Predikat (Montserrat, rata tengah)
+    predikat = assessment_results['overall']['level']
+    bbox_predikat = font_angka.getbbox(predikat)
+    w_predikat = bbox_predikat[2] - bbox_predikat[0]
+    x_predikat = (image.width - w_predikat) // 2
+    draw.text((x_predikat, 475), predikat, fill="black", font=font_angka)
 
-    # Nilai individu & predikat (Montserrat)
-    draw.text((400, 350), f"{to_scale_10(assessment_results['overall']['percentage']):.2f}", fill="black", font=font_angka)
-    draw.text((400, 300), assessment_results['overall']['level'], fill="black", font=font_angka)
+    # Nilai individu (Montserrat, rata tengah)
+    nilai_individu = f"{to_scale_100(assessment_results['overall']['percentage']):.2f}"
+    bbox_individu = font_angka.getbbox(nilai_individu)
+    w_individu = bbox_individu[2] - bbox_individu[0]
+    x_individu = (image.width - w_individu) // 2
+    draw.text((x_individu, 533), nilai_individu, fill="black", font=font_angka)
 
-    # Skor indikator teknis (Montserrat)
-    y_start = 700
+    # Nilai teknis & sosial (Montserrat 44)
+    draw.text((280, 585), f"{to_scale_100(assessment_results['technical']['percentage']):.2f}", fill="black", font=font_angka_kks)
+    draw.text((580, 585), f"{to_scale_100(assessment_results['social']['percentage']):.2f}", fill="black", font=font_angka_kks)
+
+    # Skor indikator teknis (Montserrat 22)
+    teknis_y_map = [679, 726, 770, 813, 858, 898]
     for idx, (indikator, nilai) in enumerate(assessment_results['technical']['indicators'].items()):
         nilai_angka = nilai['percentage'] if isinstance(nilai, dict) and 'percentage' in nilai else nilai
-        draw.text((300, y_start + idx*40), f"{to_scale_10(nilai_angka):.2f}", fill="black", font=font_angka)
+        draw.text((283, teknis_y_map[idx]), f"{to_scale_100(nilai_angka):.2f}", fill="black", font=font_angka_besar)
 
-    # Skor indikator sosial (Montserrat)
+    # Skor indikator sosial (Montserrat 22)
+    sosial_y_map = [677, 721, 764, 808, 851]
     for idx, (indikator, nilai) in enumerate(assessment_results['social']['indicators'].items()):
         nilai_angka = nilai['percentage'] if isinstance(nilai, dict) and 'percentage' in nilai else nilai
-        draw.text((600, y_start + idx*40), f"{to_scale_10(nilai_angka):.2f}", fill="black", font=font_angka)
+        draw.text((583, sosial_y_map[idx]), f"{to_scale_100(nilai_angka):.2f}", fill="black", font=font_angka_besar)
 
     # Simpan PNG
     image.save(png_path)
 
-    # Konversi ke PDF
-    pdf = FPDF(orientation='L', unit='pt', format=image.size)
+    # Konversi ke PDF dengan orientasi sesuai gambar
+    width, height = image.size
+    orientation = 'P' if height >= width else 'L'
+    pdf = FPDF(orientation=orientation, unit='pt', format=(width, height))
     pdf.add_page()
-    pdf.image(png_path, 0, 0, image.size[0], image.size[1])
+    pdf.image(png_path, 0, 0, width, height)
     pdf.output(pdf_path)
 
     return png_path, pdf_path 
